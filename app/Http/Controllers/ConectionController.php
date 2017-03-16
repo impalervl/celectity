@@ -6,19 +6,36 @@ use App\Conection;
 use App\Project;
 use App\User;
 use App\Role;
+use App\Custom\Trans;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class ConectionController extends Controller
 {
+
+   
+
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {
-        return view('conection.form');
+    public function index(){
+        $cnt =0;
+        $user = Auth::user();
+        $projects = $user->project->all();
+        foreach ($projects as $project){
+            $conections_temp[] = $project->conection->all();
+            $cnt++;
+        }
+        for($i = 0; $i < $cnt; $i++){
+            $row = count($conections_temp[$i]);
+            for($j = 0; $j < $row; $j++){
+                $conections[] = $conections_temp[$i][$j];
+            }
+        }
+        return view('results.index',compact('conections'));
     }
 
     /**
@@ -28,7 +45,7 @@ class ConectionController extends Controller
      */
     public function create()
     {
-        //
+        return view('conection.form');
     }
 
     /**
@@ -40,30 +57,62 @@ class ConectionController extends Controller
     public function store(Request $request)
     {
         $user = Auth::user();
+        if($request->electric_user == 1 && $request->voltage == 380){
+            $current = 1.1 * ($request->capacity/(1.73 * 380 * 0.9 * 0.9));
+            $current_start = 8 * $current;
+    }
+        else{
+            $current = 1.1 * ($request->capacity/$request->voltage);
+        }
 
-        if($project = $user->project->where('name','temp')->first()){
+        $poles = $request->poles;
 
-            $input['project_id'] = $project->id;
-            $input['title'] = 'QF' . count($project->conection->all());
+        if($nominal = DB::table('breakcircuit')
+            ->where([['nominal_current', '>=', $current],['nominal_current', '<', $current *2 ],['poles','=',$poles]])
+            ->value('nominal_current')){
+
+            $inputs =  DB::table('breakcircuit')
+                ->where([['nominal_current', '=', $nominal],['poles','=',$poles]])
+                ->get();
         }
         else{
-            $project_result = Project::create(['name'=>'temp','user_id'=>$user->id]);
+            $nominal = DB::table('power_breakcircuit')
+                ->where([['nominal_current', '>=', $current]])
+                ->value('nominal_current');
 
-            $input['project_id'] = $project_result->id;
-            $input['title'] = 'QF1';
+            $inputs =  DB::table('power_breakcircuit')
+                ->where([['nominal_current', '=', $nominal]])
+                ->get();
         }
 
-            $input['name']=$request->name;
-            $input['product']='product';
-            $input['nominal_current']=$request->electric_user_current;
-            $input['poles']=$request->poles;
-            $input['break_current']=($request->electric_user_current * 8);
-            $input['outdoor_protection'] = 'GOOD';
+        foreach($inputs as $input){
 
+            $input = json_decode(json_encode($input),true);
 
-        $create = Conection::create($input);
+            if($project = $user->project->where('name','temp')->first()){
+                $input['project_id'] = $project->id;
+                $input['title'] = 'QF' . count($project->conection->all());
+            }
+            else{
+                $project_result = Project::create(['name'=>'temp','user_id'=>$user->id]);
 
-        return view('conection.result',compact('create'));
+                $input['project_id'] = $project_result->id;
+                $input['title'] = 'QF1';
+            }
+            /*if($current_start){
+                if($current_start < ((parsed($input['name'])) * $input['nominal_current'])){
+
+                    $creates[] = Conection::create($input);
+                }
+            }
+            else{
+
+                $creates[] = Conection::create($input);
+            }*/
+            $creates[] = Conection::create($input);
+        }
+        
+        return view('conection.result',compact('creates'));
     }
 
     /**
@@ -108,8 +157,17 @@ class ConectionController extends Controller
      */
     public function destroy($id)
     {
+
         Conection::findOrFail($id)->delete();
 
         return redirect('/conection');
+
     }
+/*
+    public function destroyAll($creates){
+        
+        foreach($creates as $create){
+            Conection::findOrFail($create->id)->delete();
+        }
+    }*/
 }

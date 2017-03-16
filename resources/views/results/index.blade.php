@@ -16,25 +16,25 @@
             <th>Ток отсечки</th>
             <th>Степень защиты</th>
             <th>Время создания</th>
-            <th>Удалить</th>
+            <th>удалить</th>
         </tr>
         </thead>
         <tbody>
-        @if($creates)
-            @foreach($creates as $create)
+        @if($conections)
+            @foreach($conections as $conection)
             <tr>
-                <td>{{$create->id}}</td>
-                <td>{{$create->project->name}}</td>
-                <td>{{$create->name}}</td>
-                <td>{{$create->title}}</td>
-                <td>{{$create->product}}</td>
-                <td>{{$create->nominal_current}}</td>
-                <td>{{$create->poles}}</td>
-                <td>{{$create->break_current}}</td>
-                <td>{{$create->outdoor_protection}}</td>
-                <td>{{$create->created_at}}</td>
+                <td>{{$conection->id}}</td>
+                <td>{{$conection->project->name}}</td>
+                <td>{{$conection->name}}</td>
+                <td>{{$conection->title}}</td>
+                <td>{{$conection->product}}</td>
+                <td>{{$conection->nominal_current}}</td>
+                <td>{{$conection->poles}}</td>
+                <td>{{$conection->break_current}}</td>
+                <td>{{$conection->outdoor_protection}}</td>
+                <td>{{$conection->created_at}}</td>
                 <td>
-                    {!! Form::open(['method'=>'DELETE','action'=>['ConectionController@destroy',$create->id]]) !!}
+                    {!! Form::open(['method'=>'DELETE','action'=>['ConectionController@destroy',$conection->id]]) !!}
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
                     <div class="form-group">
                         {!! Form::submit('Удалить результат',['class'=>'btn btn-danger']) !!}
@@ -43,7 +43,10 @@
                 </td>
             </tr>
             @endforeach
-        @endif
+
         </tbody>
     </table>
+    @else
+        <a href={{route('conection.create')}}>Расчитать первое присоединение</a>
+    @endif
 @stop

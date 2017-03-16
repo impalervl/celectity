@@ -8,7 +8,8 @@
                 <div class="panel-heading">Dashboard</div>
 
                 <div class="panel-body">
-                    <a href={{route('conection.index')}}>Расчёт присоединения</a>
+
+                    <h1>привет</h1>
                 </div>
             </div>
         </div>

@@ -36,7 +36,7 @@
 
                     <!-- Branding Image -->
                     <a class="navbar-brand" href="{{ url('/') }}">
-                        {{ config('app.name', 'Laravel') }}
+                        <h1>СЕЛЕКТИВНОСТЬ</h1>
                     </a>
                 </div>
 
@@ -44,6 +44,13 @@
                     <!-- Left Side Of Navbar -->
                     <ul class="nav navbar-nav">
                         &nbsp;
+                    </ul>
+                    <ul class="nav navbar-nav navbar-centr">
+                        <a href={{route('conection.create')}}>Расчёт присоединения</a>
+                    </ul>
+
+                    <ul class="nav navbar-nav navbar-centr">
+                        <a href={{route('conection.index')}}>Результаты</a>
                     </ul>
 
                     <!-- Right Side Of Navbar -->

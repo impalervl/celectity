@@ -23,8 +23,13 @@
     </div>
 
     <div class="form-group">
-        {!! Form::label('electric_user_current','Номинальное значение тока(A)') !!}
-        {!! Form::text('electric_user_current', null, ['class' =>'form-control']) !!}
+        {!! Form::label('voltage','Номинальное напряжение(B)') !!}
+        {!! Form::select('voltage',array(''=>'Класс напряжения','220'=>'220','380'=>'380'), null, ['class' =>'form-control']) !!}
+    </div>
+
+    <div class="form-group">
+        {!! Form::label('capacity','Номинальная мощность(Вт)') !!}
+        {!! Form::text('capacity', null, ['class' =>'form-control']) !!}
     </div>
 
     {!! Form::submit('Подтвердить', ['class' =>'btn btn-primary']) !!}
